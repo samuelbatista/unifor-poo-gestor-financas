@@ -57,6 +57,10 @@ classDiagram
         + setOrcamentoEmCentavos(orcamentoEmCentavos: long) void
     }
     
+    class ValidacaoException {
+        + ValidacaoException(mensagem: String)
+    }
+    
     class Despesa {
         <<abstract>>
         %% Atributos
@@ -106,6 +110,7 @@ classDiagram
     %% ===== Heranças =====
     Despesa <|-- DespesaFixa
     Despesa <|-- DespesaPorPessoa
+    Exception <|-- ValidacaoException
 
     %% ===== Implementações =====
     PersistenciaPlanejamento <|.. PersistenciaEmArquivo
@@ -117,6 +122,7 @@ classDiagram
 
     %% ===== Dependências =====
     PersistenciaPlanejamento ..> Planejamento : salva e carrega
+    Participante ..> ValidacaoException : lança
 ```
 
 ## Decisões
@@ -138,3 +144,7 @@ classDiagram
 ### Persistência
 * Usamos uma interface para a persistência: o resto do sistema só conhece salvar e carregar, então podemos trocar o arquivo por outra forma de gravação (ex.: banco de dados) sem mudar o controle nem a tela.
 * A ligação com o Planejamento é tracejada (dependência) porque a persistência só usa o Planejamento de passagem, como parâmetro do salvar e retorno do carregar, e não o guarda como atributo. Se guardasse, seria uma associação (linha cheia).
+
+### ValidacaoException
+* Criamos uma exceção própria para separar os erros de regra de negócio (dados inválidos digitados pelo usuário) dos erros técnicos do Java (ex.: falha ao gravar o arquivo), permitindo tratar cada um de forma diferente. 
+* As validações ficam antes dos this., no construtor e nos setters: assim nenhum dado inválido entra no objeto, nem na criação nem na atualização, e, se a validação recusar, os valores anteriores continuam iguais.
