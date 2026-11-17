@@ -1,6 +1,11 @@
 package app; // Indica que esta classe faz parte do pacote do principal do app (Sem ser dentro do MVC)
 
-import modelo.Participante; // Esta declaração vai importar a classe Participante do pacote do Model
+// Importa outras Classes necessárias para a Main
+import java.util.List;
+import modelo.Participante;
+import modelo.Despesa;
+import modelo.DespesaFixa;
+import modelo.DespesaPorPessoa;
 import modelo.ValidacaoException;
 
 public class Main {
@@ -18,6 +23,21 @@ public class Main {
             System.out.println(ana.getCodigo() + " - " + ana.getNome() + " - orçamento: " + ana.getOrcamentoEmCentavos() + " centavos");
             System.out.println(bruno.getCodigo() + " - " + bruno.getNome() + " - orçamento: " + bruno.getOrcamentoEmCentavos() + " centavos");
             System.out.println(carla.getCodigo() + " - " + carla.getNome() + " - orçamento: " + carla.getOrcamentoEmCentavos() + " centavos");
+
+            // Despesa 1 do caso de referência: R$ 90 fixos entre os 3
+            Despesa jantar = new DespesaFixa(1, "Jantar", 9000, List.of(ana, bruno, carla));
+            System.out.println(jantar.getDescricao() + " - Ana paga: " + jantar.calcularValorDe(ana) + " - total: " + jantar.calcularTotal());
+
+            Despesa mercado = new DespesaFixa(2, "Mercado", 6000, List.of(ana, bruno, carla));
+            Despesa taxi    = new DespesaFixa(3, "Táxi", 3000, List.of(ana, carla));
+            System.out.println(taxi.getDescricao() + " - Ana paga: " + taxi.calcularValorDe(ana) + " - Bruno paga: " + taxi.calcularValorDe(bruno));
+
+            Despesa ingresso = new DespesaPorPessoa(4, "Ingresso", 1000, List.of(ana, bruno, carla));
+            System.out.println(ingresso.getDescricao() + " - Bruno paga: " + ingresso.calcularValorDe(bruno) + " - total: " + ingresso.calcularTotal());
+
+            // Total da Ana somando as 4 despesas (na Aula 5 o Planejamento fará isso sozinho)
+            long totalAna = jantar.calcularValorDe(ana) + mercado.calcularValorDe(ana) + taxi.calcularValorDe(ana) + ingresso.calcularValorDe(ana);
+            System.out.println("Total da Ana: " + totalAna + " - orçamento: " + ana.getOrcamentoEmCentavos());
 
         } catch (ValidacaoException e) {
             System.out.println("Erro: " + e.getMessage());
