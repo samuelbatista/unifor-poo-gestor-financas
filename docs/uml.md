@@ -123,6 +123,8 @@ classDiagram
     %% ===== Dependências =====
     PersistenciaPlanejamento ..> Planejamento : salva e carrega
     Participante ..> ValidacaoException : lança
+    Despesa ..> ValidacaoException : lança
+    Planejamento ..> ValidacaoException : lança
 ```
 
 ## Decisões
@@ -130,6 +132,8 @@ classDiagram
 ### Planejamento
 * Criamos editarDespesa em vez de setters na Despesa: a edição cria uma despesa nova, com o mesmo ID, que substitui a anterior. Assim é possível trocar o tipo (Fixa <-> Por pessoa), o que um setter não faria, e a despesa anterior só é substituída se a nova for válida.
 * Não utilizaremos ainda um método para excluir participante pois não é obrigatório (podemos criar ao final, se tivermos tempo suficiente). Se for criado, deve impedir a exclusão enquanto o participante estiver em alguma despesa.
+* Criamos uma validação para evitar que haja duplicação de ID nas despesas pois o CRUD opera por ID e precisamos garantir a manipulação da Despesa exata.
+* Os totais, o custo do grupo e o excesso não são guardados em atributos: são calculados na hora em que são pedidos. Assim, depois de editar ou remover uma despesa, os valores já saem atualizados (regra 5), sem precisar de código de recálculo.
 
 ### Participante
 * O orçamento é guardado em centavos, como `long`: evita possíveis erros de arredondamento do double

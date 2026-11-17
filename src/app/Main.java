@@ -7,6 +7,7 @@ import modelo.Despesa;
 import modelo.DespesaFixa;
 import modelo.DespesaPorPessoa;
 import modelo.ValidacaoException;
+import modelo.Planejamento;
 
 public class Main {
     public static void main(String[] args) {
@@ -19,25 +20,32 @@ public class Main {
             Participante bruno = new Participante(2, "Bruno", 6000); // Adiciona o Bruno com ID 2 e estipula o orçamento de R$ 60,00
             Participante carla = new Participante(3, "Carla", 7000); // Adiciona a Carla com ID 3 e estipula o orçamento de R$ 70,00
 
-            // Imprime as informações de objeto de cada variável
-            System.out.println(ana.getCodigo() + " - " + ana.getNome() + " - orçamento: " + ana.getOrcamentoEmCentavos() + " centavos");
-            System.out.println(bruno.getCodigo() + " - " + bruno.getNome() + " - orçamento: " + bruno.getOrcamentoEmCentavos() + " centavos");
-            System.out.println(carla.getCodigo() + " - " + carla.getNome() + " - orçamento: " + carla.getOrcamentoEmCentavos() + " centavos");
+            // Cria o planejamento (o fichário) e guarda os 3 participantes nele
+            Planejamento planejamento = new Planejamento();
+            planejamento.adicionarParticipante(ana);
+            planejamento.adicionarParticipante(bruno);
+            planejamento.adicionarParticipante(carla);
 
-            // Despesa 1 do caso de referência: R$ 90 fixos entre os 3
+            // Cria as 4 despesas do caso de referência.
             Despesa jantar = new DespesaFixa(1, "Jantar", 9000, List.of(ana, bruno, carla));
-            System.out.println(jantar.getDescricao() + " - Ana paga: " + jantar.calcularValorDe(ana) + " - total: " + jantar.calcularTotal());
-
             Despesa mercado = new DespesaFixa(2, "Mercado", 6000, List.of(ana, bruno, carla));
             Despesa taxi    = new DespesaFixa(3, "Táxi", 3000, List.of(ana, carla));
-            System.out.println(taxi.getDescricao() + " - Ana paga: " + taxi.calcularValorDe(ana) + " - Bruno paga: " + taxi.calcularValorDe(bruno));
-
             Despesa ingresso = new DespesaPorPessoa(4, "Ingresso", 1000, List.of(ana, bruno, carla));
-            System.out.println(ingresso.getDescricao() + " - Bruno paga: " + ingresso.calcularValorDe(bruno) + " - total: " + ingresso.calcularTotal());
 
-            // Total da Ana somando as 4 despesas (na Aula 5 o Planejamento fará isso sozinho)
-            long totalAna = jantar.calcularValorDe(ana) + mercado.calcularValorDe(ana) + taxi.calcularValorDe(ana) + ingresso.calcularValorDe(ana);
-            System.out.println("Total da Ana: " + totalAna + " - orçamento: " + ana.getOrcamentoEmCentavos());
+            // Guarda as 4 despesas no planejamento
+            planejamento.adicionarDespesa(jantar);
+            planejamento.adicionarDespesa(mercado);
+            planejamento.adicionarDespesa(taxi);
+            planejamento.adicionarDespesa(ingresso);
+
+            // Resumo: para cada participante do planejamento, mostra gasto, orçamento e excesso
+            System.out.println("=== Resumo ===");
+            for (Participante p : planejamento.getParticipantes()) {
+                System.out.println(p.getNome() + " - gasta: " + planejamento.calcularTotalDe(p)
+                        + " - orçamento: " + p.getOrcamentoEmCentavos()
+                        + " - excesso: " + planejamento.calcularExcessoDe(p));
+            }
+            System.out.println("Custo total do grupo: " + planejamento.calcularCustoTotal());
 
         } catch (ValidacaoException e) {
             System.out.println("Erro: " + e.getMessage());
