@@ -1,6 +1,9 @@
 package modelo; // Indica que esta classe faz parte do pacote do Model
 
-public class Participante {
+// Importa as classes necessárias para o Participante
+import java.io.Serializable;
+
+public class Participante implements Serializable {
     private int codigo;                // Identificador único. Não pode repetir
     private String nome;               // Texto livre, mas não pode ser vazio
     private long orcamentoEmCentavos;  // R$ 70,00 = 7000 (long por aceitar valores maiores que o int)

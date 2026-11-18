@@ -8,6 +8,9 @@ import modelo.DespesaFixa;
 import modelo.DespesaPorPessoa;
 import modelo.ValidacaoException;
 import modelo.Planejamento;
+import java.io.IOException;
+import persistencia.PersistenciaPlanejamento;
+import persistencia.PersistenciaEmArquivo;
 
 public class Main {
     public static void main(String[] args) {
@@ -47,8 +50,16 @@ public class Main {
             }
             System.out.println("Custo total do grupo: " + planejamento.calcularCustoTotal());
 
+            // Persistência: salva o planejamento no arquivo e carrega de volta
+            PersistenciaPlanejamento persistencia = new PersistenciaEmArquivo("planejamento.dat");
+            persistencia.salvar(planejamento);
+            Planejamento carregado = persistencia.carregar();
+            System.out.println("Custo total do planejamento carregado: " + carregado.calcularCustoTotal());
+
         } catch (ValidacaoException e) {
             System.out.println("Erro: " + e.getMessage());
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Erro técnico ao salvar/carregar: " + e.getMessage());
         }
     }
 }

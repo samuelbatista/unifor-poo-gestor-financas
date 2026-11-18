@@ -1,2 +1,13 @@
+# Compilação do IntelliJ
 out/
+
+# Dados gerados pelo programa
+planejamento.dat
+
+# Thumbs do MacOs
 .DS_Store
+
+# Lixo do Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini

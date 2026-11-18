@@ -103,8 +103,14 @@ classDiagram
     
     class PersistenciaEmArquivo {
         - caminhoDoArquivo: String
+        + PersistenciaEmArquivo(caminhoDoArquivo: String)
         + salvar(planejamento: Planejamento) void
         + carregar() Planejamento
+    }
+
+    class Serializable {
+        <<interface>>
+        %% Interface do Java sem métodos: só "marca" as classes que podem ser gravadas em arquivo
     }
 
     %% ===== Heranças =====
@@ -114,6 +120,9 @@ classDiagram
 
     %% ===== Implementações =====
     PersistenciaPlanejamento <|.. PersistenciaEmArquivo
+    Serializable <|.. Planejamento
+    Serializable <|.. Participante
+    Serializable <|.. Despesa
 
     %% ===== Associações =====
     Planejamento "1" --> "0..*" Participante : cadastra
@@ -150,6 +159,9 @@ classDiagram
 ### Persistência
 * Usamos uma interface para a persistência: o resto do sistema só conhece salvar e carregar, então podemos trocar o arquivo por outra forma de gravação (ex.: banco de dados) sem mudar o controle nem a tela.
 * A ligação com o Planejamento é tracejada (dependência) porque a persistência só usa o Planejamento de passagem, como parâmetro do salvar e retorno do carregar, e não o guarda como atributo. Se guardasse, seria uma associação (linha cheia).
+* Gravamos o Planejamento inteiro com um único writeObject, porque a serialização é recursiva e leva junto as informações definidas do planejamento, as despesas e os participantes. Por isso, o Planejamento, o Participante e a Despesa têm o carimbo Serializable. As filhas herdam o carimbo da mãe.
+* O salvar e o carregar não tratam os erros técnicos de leitura/gravação (IOException e ClassNotFoundException, ex.: arquivo inexistente, sem permissão ou corrompido): eles os repassam com throws, e quem chamou (hoje o Main, depois a tela) decide o que mostrar ao usuário. Assim esses erros ficam separados dos erros de regra de negócio (ValidacaoException).
+* O arquivo `planejamento.dat` foi adicionado ao `.gitignore` pois pode mudar de acordo com o uso da execução, não é código do projeto e, em uso real, guardaria dados pessoais dos participantes.
 
 ### ValidacaoException
 * Criamos uma exceção própria para separar os erros de regra de negócio (dados inválidos digitados pelo usuário) dos erros técnicos do Java (ex.: falha ao gravar o arquivo), permitindo tratar cada um de forma diferente. 
