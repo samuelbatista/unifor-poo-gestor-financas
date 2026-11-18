@@ -110,6 +110,10 @@ classDiagram
         + salvar(planejamento: Planejamento) void
         + carregar() Planejamento
     }
+    
+    class PersistenciaException {
+        + PersistenciaException(mensagem: String, causa: Throwable)
+    }
 
     class Serializable {
         <<interface>>
@@ -120,6 +124,7 @@ classDiagram
     Despesa <|-- DespesaFixa
     Despesa <|-- DespesaPorPessoa
     Exception <|-- ValidacaoException
+    Exception <|-- PersistenciaException
 
     %% ===== Implementações =====
     PersistenciaPlanejamento <|.. PersistenciaEmArquivo
@@ -137,6 +142,7 @@ classDiagram
     Participante ..> ValidacaoException : lança
     Despesa ..> ValidacaoException : lança
     Planejamento ..> ValidacaoException : lança
+    PersistenciaPlanejamento ..> PersistenciaException : lança
 ```
 
 ## Decisões
@@ -166,8 +172,10 @@ classDiagram
 * Usamos uma interface para a persistência: o resto do sistema só conhece salvar e carregar, então podemos trocar o arquivo por outra forma de gravação (ex.: banco de dados) sem mudar o controle nem a tela.
 * A ligação com o Planejamento é tracejada (dependência) porque a persistência só usa o Planejamento de passagem, como parâmetro do salvar e retorno do carregar, e não o guarda como atributo. Se guardasse, seria uma associação (linha cheia).
 * Gravamos o Planejamento inteiro com um único writeObject, porque a serialização é recursiva e leva junto as informações definidas do planejamento, as despesas e os participantes. Por isso, o Planejamento, o Participante e a Despesa têm o carimbo Serializable. As filhas herdam o carimbo da mãe.
-* O salvar e o carregar não tratam os erros técnicos de leitura/gravação (IOException e ClassNotFoundException, ex.: arquivo inexistente, sem permissão ou corrompido): eles os repassam com throws, e quem chamou (hoje o Main, depois a tela) decide o que mostrar ao usuário. Assim esses erros ficam separados dos erros de regra de negócio (ValidacaoException).
+* O salvar e o carregar capturam os erros técnicos de leitura/gravação (IOException, ClassNotFoundException e ClassCastException, ex: arquivo inexistente/vazio/cortado/de texto/com outro tipo de objeto) e os embrulham numa exceção nossa, a PersistenciaException, com uma mensagem clara e o erro original guardado como causa. Quem usar a persistência (Main e/ou Front) trata um único tipo de erro, separado dos erros de regra de negócio (ValidacaoException).
 * O arquivo `planejamento.dat` foi adicionado ao `.gitignore` pois pode mudar de acordo com o uso da execução, não é código do projeto e, em uso real, guardaria dados pessoais dos participantes.
+* Todas as classes gravadas têm serialVersionUID = 1L fixo: sem ele, o Java calcula um número a partir do código, e qualquer mudança na classe impediria abrir arquivos salvos antes.
+* Ao carregar, o planejamento novo é lido para uma variável à parte e só depois substitui o que está em uso. Se o arquivo for inválido, a exceção acontece antes da troca e o planejamento em uso continua igual.
 
 ### ValidacaoException
 * Criamos uma exceção própria para separar os erros de regra de negócio (dados inválidos digitados pelo usuário) dos erros técnicos do Java (ex.: falha ao gravar o arquivo), permitindo tratar cada um de forma diferente. 

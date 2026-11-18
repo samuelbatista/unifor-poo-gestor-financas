@@ -9,6 +9,9 @@ import java.util.List;
  */
 public class DespesaPorPessoa extends Despesa {
 
+    // versão do formato salvo (muda só se a classe mudar de forma incompatível)
+    private static final long serialVersionUID = 1L;
+
     public DespesaPorPessoa(int id, String descricao, long valorEmCentavos, List<Participante> participantes) throws ValidacaoException {
         super(id, descricao, valorEmCentavos, participantes); // repassa para a mãe (Despesa), que valida e guarda
     }

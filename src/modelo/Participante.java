@@ -4,6 +4,11 @@ package modelo; // Indica que esta classe faz parte do pacote do Model
 import java.io.Serializable;
 
 public class Participante implements Serializable {
+
+    // versão do formato salvo (muda só se a classe mudar de forma incompatível)
+    private static final long serialVersionUID = 1L;
+
+    // Atributos
     private int codigo;                // Identificador único. Não pode repetir
     private String nome;               // Texto livre, mas não pode ser vazio
     private long orcamentoEmCentavos;  // R$ 70,00 = 7000 (long por aceitar valores maiores que o int)

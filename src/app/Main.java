@@ -8,7 +8,7 @@ import modelo.DespesaFixa;
 import modelo.DespesaPorPessoa;
 import modelo.ValidacaoException;
 import modelo.Planejamento;
-import java.io.IOException;
+import persistencia.PersistenciaException;
 import persistencia.PersistenciaPlanejamento;
 import persistencia.PersistenciaEmArquivo;
 
@@ -169,9 +169,26 @@ public class Main {
             }
             imprimirRetrato(planejamento);
 
+            // ===== Testes de arquivo =====
+            System.out.println("=== Testes de arquivo ===");
+
+            System.out.println("12. Carregar o mesmo arquivo de novo (nada pode dobrar/duplicar):");
+            Planejamento deNovo = persistencia.carregar();
+            imprimirRetrato(deNovo);
+
+            System.out.println("13. Carregar um arquivo de texto (docs/uml.md):");
+            imprimirRetrato(carregado);
+            try {
+                carregado = new PersistenciaEmArquivo("docs/uml.md").carregar();
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (PersistenciaException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(carregado);
+
         } catch (ValidacaoException e) {
             System.out.println("Erro: " + e.getMessage());
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (PersistenciaException e) {
             System.out.println("Erro técnico ao salvar/carregar: " + e.getMessage());
         }
     }
