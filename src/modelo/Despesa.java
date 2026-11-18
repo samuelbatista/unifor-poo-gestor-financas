@@ -19,8 +19,11 @@ public abstract class Despesa implements Serializable {
     public Despesa(int id, String descricao, long valorEmCentavos, List<Participante> participantes) throws ValidacaoException {
 
         // Validações para garantir que uma despesa será criada com um valor maior que zero e com pelo menos 1 participante
+        if (descricao == null || descricao.isBlank()) {
+            throw new ValidacaoException("A despesa precisa ter uma descrição.");
+        }
         if (valorEmCentavos <= 0) {
-            throw new ValidacaoException("Despesas precisam ter valores maiores que zero.");
+            throw new ValidacaoException("O valor da despesa precisa ser maior que zero (recebido: " + valorEmCentavos + ").");
         }
         if (participantes == null || participantes.isEmpty()) {
             throw new ValidacaoException("A despesa precisa ter pelo menos um participante.");
@@ -30,7 +33,7 @@ public abstract class Despesa implements Serializable {
         List<Participante> vistos = new ArrayList<>();
         for (Participante p : participantes) {
             if (vistos.contains(p)) {
-                throw new ValidacaoException("Um participante não pode aparecer duas vezes na mesma despesa.");
+                throw new ValidacaoException("O participante " + p.getNome() + " aparece duas vezes na mesma despesa.");
             }
             vistos.add(p);
         }

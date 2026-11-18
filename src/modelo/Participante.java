@@ -17,7 +17,7 @@ public class Participante implements Serializable {
         }
 
         if (orcamentoEmCentavos < 0) {
-            throw new ValidacaoException("Orçamentos precisam ter valores iguais ou maiores que zero.");
+            throw new ValidacaoException("O orçamento não pode ser negativo (recebido: " + orcamentoEmCentavos + ").");
         }
 
         this.codigo = codigo;
@@ -40,7 +40,7 @@ public class Participante implements Serializable {
 
     public void setOrcamentoEmCentavos(long orcamentoEmCentavos) throws ValidacaoException {
         if (orcamentoEmCentavos < 0) {
-            throw new ValidacaoException("Orçamentos precisam ter valores iguais ou maiores que zero.");
+            throw new ValidacaoException("O orçamento não pode ser negativo (recebido: " + orcamentoEmCentavos + ").");
         }
         this.orcamentoEmCentavos = orcamentoEmCentavos;
     }

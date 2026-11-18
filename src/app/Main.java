@@ -56,10 +56,130 @@ public class Main {
             Planejamento carregado = persistencia.carregar();
             System.out.println("Custo total do planejamento carregado: " + carregado.calcularCustoTotal());
 
+            // ===== Testes de recusa: cada um deve recusar, e o retrato não pode mudar =====
+            System.out.println("=== Testes de recusa ===");
+
+            System.out.println("1. Código de participante repetido:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarParticipante(new Participante(1, "Davi", 5000));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("2. Nome só com espaços:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarParticipante(new Participante(4, "    ", 5000));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("3. Orçamento negativo:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarParticipante(new Participante(4, "Davi", -100));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("4. Alterar orçamento para negativo:");
+            imprimirRetrato(planejamento);
+            try {
+                ana.setOrcamentoEmCentavos(-100);
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("5. Despesa com descrição vazia:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarDespesa(new DespesaFixa(5, "  ", 1000, List.of(ana)));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("6. Despesa com valor zero:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarDespesa(new DespesaFixa(5, "Lanche", 0, List.of(ana)));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("7. Despesa sem participantes:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarDespesa(new DespesaFixa(5, "Lanche", 1000, List.of()));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("8. Participante repetido na despesa:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarDespesa(new DespesaFixa(5, "Lanche", 1000, List.of(ana, ana)));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("9. Participante não cadastrado:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.adicionarDespesa(new DespesaFixa(5, "Lanche", 1000, List.of(new Participante(9, "Davi", 5000))));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("10. Excluir despesa inexistente:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.removerDespesa(99);
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
+            System.out.println("11. Editar despesa trocando o id:");
+            imprimirRetrato(planejamento);
+            try {
+                planejamento.editarDespesa(1, new DespesaFixa(7, "Jantar", 9000, List.of(ana, bruno, carla)));
+                System.out.println("   ERRO: aceitou o que devia recusar");
+            } catch (ValidacaoException e) {
+                System.out.println("   Recusou: " + e.getMessage());
+            }
+            imprimirRetrato(planejamento);
+
         } catch (ValidacaoException e) {
             System.out.println("Erro: " + e.getMessage());
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Erro técnico ao salvar/carregar: " + e.getMessage());
         }
+    }
+
+    // Imprime um "retrato" do planejamento, para comparar antes e depois de uma recusa
+    static void imprimirRetrato(Planejamento planejamento) {
+        System.out.println("   Retrato: " + planejamento.getParticipantes().size() + " participantes, "
+                + planejamento.getDespesas().size() + " despesas, custo total "
+                + planejamento.calcularCustoTotal());
     }
 }
