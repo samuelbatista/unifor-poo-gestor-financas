@@ -1,4 +1,4 @@
-# Diagrama de classes v1
+# Diagrama de classes v2
 
 ## Observações
 * Utilizamos o Mermaid para que os diagramas de classe possam ser vistos em tempo real e versionados junto com o projeto
@@ -39,6 +39,9 @@ classDiagram
         + calcularCustoTotal() long
         + calcularExcessoDe(participante: Participante) long
         + estaDentroDoOrcamento(participante: Participante) boolean
+        
+        %% Ajudante interno: recusa despesa com participante não cadastrado
+        - conferirParticipantesCadastrados(despesa: Despesa) void
     }
     
     class Participante {
@@ -89,11 +92,17 @@ classDiagram
     }
     
     class DespesaFixa {
+        %% Construtor: repassa os dados para a Despesa (super), que valida e guarda
+        + DespesaFixa(id: int, descricao: String, valorEmCentavos: long, participantes: List~Participante~)
+        
         %% Método para calcular o valor da despesa fixa por participante
         + calcularValorDe(participante: Participante) long
     }
 
     class DespesaPorPessoa {
+        %% Construtor: repassa os dados para a Despesa (super), que valida e guarda
+        + DespesaPorPessoa(id: int, descricao: String, valorEmCentavos: long, participantes: List~Participante~)
+        
         %% Método para calcular o valor da despesa (não fixa) por participante
         + calcularValorDe(participante: Participante) long
     }
@@ -132,9 +141,9 @@ classDiagram
     Serializable <|.. Participante
     Serializable <|.. Despesa
 
-    %% ===== Associações =====
-    Planejamento "1" --> "0..*" Participante : cadastra
-    Planejamento "1" --> "0..*" Despesa : registra
+    %% ===== Composições e associações =====
+    Planejamento "1" *-- "0..*" Participante : cadastra
+    Planejamento "1" *-- "0..*" Despesa : registra
     Despesa "0..*" --> "1..*" Participante : divide entre
 
     %% ===== Dependências =====
@@ -144,6 +153,31 @@ classDiagram
     Planejamento ..> ValidacaoException : lança
     PersistenciaPlanejamento ..> PersistenciaException : lança
 ```
+
+## Justificativa das relações
+
+### Composições e associações
+* `Planejamento *-- Participante` (composição, `1` para `0..*`): os participantes só existem dentro do planejamento: são cadastrados nele, guardados na sua lista privada, salvos e carregados junto com ele e descartados quando um novo planejamento começa. Pode haver planejamento ainda sem participantes (`0..*`).
+* `Planejamento *-- Despesa` (composição, `1` para `0..*`): mesma lógica: a despesa nasce ao ser registrada no planejamento e deixa de existir quando é removida dele.
+* `Despesa --> Participante` (associação, `0..*` para `1..*`): a despesa só aponta para quem divide o valor; ela não é dona dos participantes (apagar uma despesa não apaga ninguém). Toda despesa tem pelo menos um participante (`1..*`), e um participante pode estar em nenhuma ou em várias despesas (`0..*`).
+
+### Heranças
+* `Despesa <|-- DespesaFixa` e `DespesaPorPessoa`: as duas "são uma" Despesa: herdam id, descrição, valor, participantes e as validações, e cada uma só redefine a regra de cálculo (calcularValorDe), o que permite o polimorfismo.
+* `Exception <|-- ValidacaoException` e `PersistenciaException`: exceções próprias do domínio, que herdam de Exception o comportamento de qualquer exceção (mensagem, causa) e separam erros de regra de negócio de erros de arquivo.
+
+### Implementações (realização)
+* `PersistenciaPlanejamento <|.. PersistenciaEmArquivo`: a classe de arquivo cumpre o contrato (salvar e carregar). O resto do sistema conhece só a interface, então a forma de gravar pode mudar sem afetar o restante.
+* `Serializable <|.. Planejamento`, `Participante` e `Despesa`: o "carimbo" que autoriza o Java a gravar esses objetos em arquivo (as filhas da Despesa herdam o carimbo).
+
+### Dependências
+* `PersistenciaPlanejamento ..> Planejamento`: a persistência usa o planejamento só de passagem (parâmetro do salvar, retorno do carregar), sem guardá-lo como atributo.
+* `Participante`, `Despesa` e `Planejamento ..> ValidacaoException`: lançam a exceção quando recusam uma entrada inválida, mas não a guardam.
+* `PersistenciaPlanejamento ..> PersistenciaException`: o salvar e o carregar lançam a exceção quando o arquivo falha.
+
+## Justificativa das coleções
+* Planejamento.participantes: List (ArrayList): mantém a ordem de cadastro, que é a ordem em que a tela vai listar. Não usamos Set porque a regra de unicidade é pelo código (não pelo objeto inteiro) e precisa recusar com mensagem, o que o porteiro do adicionarParticipante faz. Não usamos Map (código → participante) porque o grupo é pequeno e a busca percorrendo a lista é simples e suficiente.
+* Planejamento.despesas: List (ArrayList): mantém a ordem de lançamento e permite trocar uma despesa no mesmo lugar ao editar (indexOf + set). O id único é garantido pelo contador e pelo porteiro do adicionarDespesa.
+* Despesa.participantes: List: guarda quem divide a despesa. Não usamos Set para que um participante repetido seja recusado com mensagem, em vez de sumir em silêncio, e para que a ordem informada seja mantida.
 
 ## Decisões
 
