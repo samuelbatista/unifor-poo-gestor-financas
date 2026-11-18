@@ -17,7 +17,7 @@ public class Planejamento implements Serializable {
 
         for (Participante p : participantes) {
             if (p.getCodigo() == participante.getCodigo()) {
-                throw new ValidacaoException("Já existe um participante com este código.");
+                throw new ValidacaoException("Já existe um participante com o código " + participante.getCodigo() + ".");
             }
         }
         participantes.add(participante);
@@ -49,9 +49,10 @@ public class Planejamento implements Serializable {
 
         for (Despesa d : despesas) {
             if (d.getId() == despesa.getId()) {
-                throw new ValidacaoException("Já existe uma despesa com este ID.");
+                throw new ValidacaoException("Já existe uma despesa com o id " + despesa.getId() + ".");
             }
         }
+        conferirParticipantesCadastrados(despesa);
         despesas.add(despesa);
     }
 
@@ -70,7 +71,7 @@ public class Planejamento implements Serializable {
     public void removerDespesa(int id) throws ValidacaoException {
         Despesa encontrada = buscarDespesa(id); // reaproveita a busca
         if (encontrada == null) {
-            throw new ValidacaoException("Não existe despesa com este ID.");
+            throw new ValidacaoException("Não existe despesa com o id " + id + ".");
         }
         despesas.remove(encontrada); // Remove a despesa
     }
@@ -79,11 +80,13 @@ public class Planejamento implements Serializable {
     public void editarDespesa(int id, Despesa novaDespesa) throws ValidacaoException {
         Despesa antiga = buscarDespesa(id);
         if (antiga == null) {
-            throw new ValidacaoException("Não existe despesa com este ID.");
+            throw new ValidacaoException("Não existe despesa com o id " + id + ".");
         }
         if (novaDespesa.getId() != id) {
-            throw new ValidacaoException("A despesa editada precisa manter o mesmo ID.");
+            throw new ValidacaoException("A despesa editada precisa manter o id " + id + ".");
         }
+
+        conferirParticipantesCadastrados(novaDespesa);
 
         int posicao = despesas.indexOf(antiga);  // em que posição da fila está a antiga
         despesas.set(posicao, novaDespesa);      // coloca a nova no mesmo lugar
@@ -119,6 +122,15 @@ public class Planejamento implements Serializable {
     // Está dentro do orçamento quando não há excesso (gastar exatamente o orçamento conta como dentro)
     public boolean estaDentroDoOrcamento(Participante participante) {
         return calcularExcessoDe(participante) == 0;
+    }
+
+    // Ajudante: recusa a despesa se algum participante dela não estiver cadastrado neste planejamento
+    private void conferirParticipantesCadastrados(Despesa despesa) throws ValidacaoException {
+        for (Participante p : despesa.getParticipantes()) {
+            if (!participantes.contains(p)) {
+                throw new ValidacaoException("O participante " + p.getNome() + " (código " + p.getCodigo() + ") não está cadastrado no planejamento.");
+            }
+        }
     }
 
 }
