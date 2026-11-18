@@ -7,6 +7,9 @@ import java.util.ArrayList;
 
 public class Planejamento implements Serializable {
 
+    // versão do formato salvo (muda só se a classe mudar de forma incompatível)
+    private static final long serialVersionUID = 1L;
+
     // Atributos
     private List<Participante> participantes = new ArrayList<>();
     private List<Despesa> despesas = new ArrayList<>();

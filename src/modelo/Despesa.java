@@ -9,6 +9,10 @@ import java.io.Serializable;
  * A Despesa será uma classe abstrata que servirá de base para as Classes Filhas (DespesaFixa e DespesaPorPessoa)
  */
 public abstract class Despesa implements Serializable {
+
+    // versão do formato salvo (muda só se a classe mudar de forma incompatível)
+    private static final long serialVersionUID = 1L;
+
     // Atributos
     private int id;
     private String descricao;

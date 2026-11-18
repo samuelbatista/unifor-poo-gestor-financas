@@ -19,19 +19,24 @@ public class PersistenciaEmArquivo implements PersistenciaPlanejamento {
 
     // Grava o planejamento inteiro (com participantes e despesas) no arquivo
     @Override
-    public void salvar(Planejamento planejamento) throws IOException {
+    public void salvar(Planejamento planejamento) throws PersistenciaException {
         try (FileOutputStream arquivo = new FileOutputStream(caminhoDoArquivo);
              ObjectOutputStream saida = new ObjectOutputStream(arquivo)) {
             saida.writeObject(planejamento);
+        } catch (IOException e) {
+            throw new PersistenciaException("Não foi possível salvar o planejamento em " + caminhoDoArquivo + ".", e);
         }
     }
 
     // Carrega o planejamento a partir do arquivo
     @Override
-    public Planejamento carregar() throws IOException, ClassNotFoundException {
+    public Planejamento carregar() throws PersistenciaException {
         try (FileInputStream arquivo = new FileInputStream(caminhoDoArquivo);
              ObjectInputStream entrada = new ObjectInputStream(arquivo)) {
             return (Planejamento) entrada.readObject();
+        }
+        catch (IOException | ClassNotFoundException | ClassCastException e) {
+            throw new PersistenciaException("Não foi possível carregar o planejamento de " + caminhoDoArquivo + ": arquivo ausente ou inválido.", e);
         }
     }
 }
