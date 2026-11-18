@@ -19,6 +19,10 @@ public class TestesManuais {
             testarRecusas(planejamento);
             testarArquivo(planejamento);
 
+            System.out.println("=== Cenário próprio ===");
+            Planejamento cenario = montarCenarioProprio();
+            imprimirResumo(cenario);
+
         } catch (ValidacaoException e) {
             System.out.println("Erro: " + e.getMessage());
         } catch (PersistenciaException e) {
@@ -41,6 +45,35 @@ public class TestesManuais {
         planejamento.adicionarDespesa(new DespesaFixa(planejamento.gerarIdDespesa(), "Mercado", 6000, List.of(ana, bruno, carla)));
         planejamento.adicionarDespesa(new DespesaFixa(planejamento.gerarIdDespesa(), "Táxi", 3000, List.of(ana, carla)));
         planejamento.adicionarDespesa(new DespesaPorPessoa(planejamento.gerarIdDespesa(), "Ingresso", 1000, List.of(ana, bruno, carla)));
+
+        return planejamento;
+    }
+
+    // Monta o cenário próprio da equipe (docs/testes.md, teste 8): 6 participantes e 8 despesas
+    static Planejamento montarCenarioProprio() throws ValidacaoException {
+        Planejamento planejamento = new Planejamento();
+        planejamento.adicionarParticipante(new Participante(1, "Andressa", 10000));
+        planejamento.adicionarParticipante(new Participante(2, "Guilherme", 10000));
+        planejamento.adicionarParticipante(new Participante(3, "Luana", 15000));
+        planejamento.adicionarParticipante(new Participante(4, "Lucas", 15000));
+        planejamento.adicionarParticipante(new Participante(5, "Malu", 10000));
+        planejamento.adicionarParticipante(new Participante(6, "Samuel", 8000));
+
+        Participante andressa  = planejamento.buscarParticipante(1);
+        Participante guilherme = planejamento.buscarParticipante(2);
+        Participante luana     = planejamento.buscarParticipante(3);
+        Participante lucas     = planejamento.buscarParticipante(4);
+        Participante malu      = planejamento.buscarParticipante(5);
+        Participante samuel    = planejamento.buscarParticipante(6);
+
+        planejamento.adicionarDespesa(new DespesaFixa(planejamento.gerarIdDespesa(), "Gasolina da ida", 2500, List.of(guilherme, lucas, samuel)));
+        planejamento.adicionarDespesa(new DespesaPorPessoa(planejamento.gerarIdDespesa(), "Ônibus da ida", 450, List.of(andressa, malu)));
+        planejamento.adicionarDespesa(new DespesaFixa(planejamento.gerarIdDespesa(), "Uber da ida", 1800, List.of(luana)));
+        planejamento.adicionarDespesa(new DespesaPorPessoa(planejamento.gerarIdDespesa(), "Cinema", 800, List.of(andressa, guilherme, luana, lucas, malu, samuel)));
+        planejamento.adicionarDespesa(new DespesaPorPessoa(planejamento.gerarIdDespesa(), "Combo pipoca + refrigerante", 1600, List.of(andressa, lucas, malu, samuel)));
+        planejamento.adicionarDespesa(new DespesaFixa(planejamento.gerarIdDespesa(), "Happy hour", 33000, List.of(andressa, guilherme, luana, lucas, malu, samuel)));
+        planejamento.adicionarDespesa(new DespesaPorPessoa(planejamento.gerarIdDespesa(), "Show", 2000, List.of(andressa, guilherme, luana, lucas, malu)));
+        planejamento.adicionarDespesa(new DespesaFixa(planejamento.gerarIdDespesa(), "Uber da volta", 8000, List.of(andressa, luana)));
 
         return planejamento;
     }
