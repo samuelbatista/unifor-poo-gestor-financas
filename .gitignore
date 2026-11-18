@@ -2,8 +2,10 @@
 out/
 fontes.txt
 
-# Dados gerados pelo programa
+
+# Dados sensiveis e/ou gerados pelo programa
 planejamento.dat
+*.pdf
 
 # Thumbs do MacOs
 .DS_Store
