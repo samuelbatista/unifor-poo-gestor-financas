@@ -30,10 +30,10 @@ public class Main {
             planejamento.adicionarParticipante(carla);
 
             // Cria as 4 despesas do caso de referência.
-            Despesa jantar = new DespesaFixa(1, "Jantar", 9000, List.of(ana, bruno, carla));
-            Despesa mercado = new DespesaFixa(2, "Mercado", 6000, List.of(ana, bruno, carla));
-            Despesa taxi    = new DespesaFixa(3, "Táxi", 3000, List.of(ana, carla));
-            Despesa ingresso = new DespesaPorPessoa(4, "Ingresso", 1000, List.of(ana, bruno, carla));
+            Despesa jantar   = new DespesaFixa(planejamento.gerarIdDespesa(), "Jantar", 9000, List.of(ana, bruno, carla));
+            Despesa mercado  = new DespesaFixa(planejamento.gerarIdDespesa(), "Mercado", 6000, List.of(ana, bruno, carla));
+            Despesa taxi     = new DespesaFixa(planejamento.gerarIdDespesa(), "Táxi", 3000, List.of(ana, carla));
+            Despesa ingresso = new DespesaPorPessoa(planejamento.gerarIdDespesa(), "Ingresso", 1000, List.of(ana, bruno, carla));
 
             // Guarda as 4 despesas no planejamento
             planejamento.adicionarDespesa(jantar);

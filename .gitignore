@@ -11,3 +11,6 @@ planejamento.dat
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Ferramenta de conferência de valores
+src/validador/

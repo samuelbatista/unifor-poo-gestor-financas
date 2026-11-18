@@ -15,6 +15,7 @@ classDiagram
         %% Atributos
         - participantes: List~Participante~
         - despesas: List~Despesa~
+        - ultimoIdDespesa: int
         
         %% Método para o CRUD de Participante
         + adicionarParticipante(participante: Participante) void
@@ -27,6 +28,7 @@ classDiagram
         + getDespesas() List~Despesa~
         
         %% Método para o CRUD de Despesa
+        + gerarIdDespesa() int
         + adicionarDespesa(despesa: Despesa) void
         + buscarDespesa(id: int) Despesa
         + editarDespesa(id: int, novaDespesa: Despesa) void
@@ -36,6 +38,7 @@ classDiagram
         + calcularTotalDe(participante: Participante) long
         + calcularCustoTotal() long
         + calcularExcessoDe(participante: Participante) long
+        + estaDentroDoOrcamento(participante: Participante) boolean
     }
     
     class Participante {
@@ -143,6 +146,7 @@ classDiagram
 * Não utilizaremos ainda um método para excluir participante pois não é obrigatório (podemos criar ao final, se tivermos tempo suficiente). Se for criado, deve impedir a exclusão enquanto o participante estiver em alguma despesa.
 * Criamos uma validação para evitar que haja duplicação de ID nas despesas pois o CRUD opera por ID e precisamos garantir a manipulação da Despesa exata.
 * Os totais, o custo do grupo e o excesso não são guardados em atributos: são calculados na hora em que são pedidos. Assim, depois de editar ou remover uma despesa, os valores já saem atualizados (regra 5), sem precisar de código de recálculo.
+* O id da despesa é gerado pelo próprio Planejamento (gerarIdDespesa), com um contador que só cresce. Assim quem cria a despesa não precisa inventar um número, e um id nunca se repete, nem depois de excluir uma despesa. Como o contador é atributo do Planejamento, ele é salvo junto no arquivo.
 
 ### Participante
 * O orçamento é guardado em centavos, como `long`: evita possíveis erros de arredondamento do double

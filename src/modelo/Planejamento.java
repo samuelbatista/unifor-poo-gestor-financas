@@ -10,6 +10,7 @@ public class Planejamento implements Serializable {
     // Atributos
     private List<Participante> participantes = new ArrayList<>();
     private List<Despesa> despesas = new ArrayList<>();
+    private int ultimoIdDespesa = 0; // último id de despesa entregue (0 = nenhum ainda)
 
     // CRUD Participante: Create (guarda o participante na lista)
     public void adicionarParticipante(Participante participante) throws ValidacaoException {
@@ -36,6 +37,12 @@ public class Planejamento implements Serializable {
     // Getters
     public List<Participante> getParticipantes() { return participantes; }
     public List<Despesa> getDespesas() { return despesas; }
+
+    // Gera um id novo para despesa: soma 1 ao último entregue e devolve
+    public int gerarIdDespesa() {
+        ultimoIdDespesa++;
+        return ultimoIdDespesa;
+    }
 
     // CRUD Despesa: Create (guarda a despesa na lista)
     public void adicionarDespesa(Despesa despesa) throws ValidacaoException {
@@ -107,6 +114,11 @@ public class Planejamento implements Serializable {
             return excesso;                                                                   //
         }
         return 0;                                                                             // 3. Não passou: excesso zero
+    }
+
+    // Está dentro do orçamento quando não há excesso (gastar exatamente o orçamento conta como dentro)
+    public boolean estaDentroDoOrcamento(Participante participante) {
+        return calcularExcessoDe(participante) == 0;
     }
 
 }
