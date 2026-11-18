@@ -1,13 +1,14 @@
 package modelo;
 
-// Importa a classe do Java para fazer as listagens
+// Importa as classes necessárias para a Despesa
 import java.util.List;
 import java.util.ArrayList;
+import java.io.Serializable;
 
 /**
  * A Despesa será uma classe abstrata que servirá de base para as Classes Filhas (DespesaFixa e DespesaPorPessoa)
  */
-public abstract class Despesa {
+public abstract class Despesa implements Serializable {
     // Atributos
     private int id;
     private String descricao;

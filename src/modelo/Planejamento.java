@@ -1,10 +1,11 @@
 package modelo;
 
-// Imports
+// Importa as classes necessárias para o Planejamento
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Planejamento {
+public class Planejamento implements Serializable {
 
     // Atributos
     private List<Participante> participantes = new ArrayList<>();
