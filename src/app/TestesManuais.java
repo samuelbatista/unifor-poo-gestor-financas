@@ -18,6 +18,7 @@ public class TestesManuais {
             imprimirResumo(planejamento);
             testarRecusas(planejamento);
             testarArquivo(planejamento);
+            testarAlteracao(planejamento);
 
             System.out.println("=== Cenário próprio ===");
             Planejamento cenario = montarCenarioProprio();
@@ -207,6 +208,31 @@ public class TestesManuais {
         }
         imprimirRetrato(planejamento);
     }
+
+    // Testes 14 e 15: alterar participante é "tudo ou nada", e código inexistente é recusado
+    static void testarAlteracao(Planejamento planejamento) {
+        System.out.println("=== Testes de alteração de participante ===");
+        Participante bruno = planejamento.buscarParticipante(2);
+
+        System.out.println("14. Alterar com nome válido e orçamento negativo:");
+        System.out.println("   Antes:  " + bruno.getNome() + ", " + bruno.getOrcamentoEmCentavos());
+        try {
+            planejamento.alterarParticipante(2, "Bruno Novo", -100);
+            System.out.println("   ERRO: aceitou o que devia recusar");
+        } catch (ValidacaoException e) {
+            System.out.println("   Recusou: " + e.getMessage());
+        }
+        System.out.println("   Depois: " + bruno.getNome() + ", " + bruno.getOrcamentoEmCentavos());
+
+        System.out.println("15. Alterar participante com código que não existe:");
+        try {
+            planejamento.alterarParticipante(99, "Davi", 5000);
+            System.out.println("   ERRO: aceitou o que devia recusar");
+        } catch (ValidacaoException e) {
+            System.out.println("   Recusou: " + e.getMessage());
+        }
+    }
+
 
     // Salva e carrega o planejamento; testes 12 e 13: carregar de novo não duplica, e arquivo inválido é recusado
     static void testarArquivo(Planejamento planejamento) throws PersistenciaException {

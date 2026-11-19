@@ -37,6 +37,15 @@ public class Planejamento implements Serializable {
         return null; // Não achou participante com o código informado
     }
 
+    // CRUD Participante: Update (altera nome e orçamento juntos; recusa se o código não existir)
+    public void alterarParticipante(int codigo, String novoNome, long novoOrcamentoEmCentavos) throws ValidacaoException {
+        Participante encontrado = buscarParticipante(codigo); // reaproveita a busca
+        if (encontrado == null) {
+            throw new ValidacaoException("Não existe participante com o código " + codigo + ".");
+        }
+        encontrado.alterar(novoNome, novoOrcamentoEmCentavos); // o participante confere tudo antes de mudar
+    }
+
     // Getters
     public List<Participante> getParticipantes() { return participantes; }
     public List<Despesa> getDespesas() { return despesas; }
