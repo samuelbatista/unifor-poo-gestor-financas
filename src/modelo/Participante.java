@@ -49,4 +49,17 @@ public class Participante implements Serializable {
         }
         this.orcamentoEmCentavos = orcamentoEmCentavos;
     }
+
+    // Altera nome e orçamento juntos ("tudo ou nada"): confere os dois antes de mudar qualquer um
+    public void alterar(String novoNome, long novoOrcamentoEmCentavos) throws ValidacaoException {
+        if (novoNome == null || novoNome.isBlank()) {
+            throw new ValidacaoException("O nome do participante não pode ser vazio.");
+        }
+        if (novoOrcamentoEmCentavos < 0) {
+            throw new ValidacaoException("O orçamento não pode ser negativo (recebido: " + novoOrcamentoEmCentavos + ").");
+        }
+        // Só chega aqui se os dois estiverem certos: agora "carimba"
+        this.nome = novoNome;
+        this.orcamentoEmCentavos = novoOrcamentoEmCentavos;
+    }
 }

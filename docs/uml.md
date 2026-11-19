@@ -20,7 +20,7 @@ classDiagram
         %% Método para o CRUD de Participante
         + adicionarParticipante(participante: Participante) void
         + buscarParticipante(codigo: int) Participante
-        %% Update será feito pelos setters do Participante
+        + alterarParticipante(codigo: int, novoNome: String, novoOrcamentoEmCentavos: long) void
         %% Delete (Pendente / Não obrigatório)
         
         %% Getters: Traz os valores
@@ -57,6 +57,9 @@ classDiagram
         + getCodigo() int
         + getNome() String
         + getOrcamentoEmCentavos() long
+        
+        %% Altera nome e orçamento juntos ("tudo ou nada")
+        + alterar(novoNome: String, novoOrcamentoEmCentavos: long) void
         
         %% Setters: Define os valores
         + setNome(nome: String) void
