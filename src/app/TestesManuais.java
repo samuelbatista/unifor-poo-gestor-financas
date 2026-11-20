@@ -19,6 +19,7 @@ public class TestesManuais {
             testarRecusas(planejamento);
             testarArquivo(planejamento);
             testarAlteracao(planejamento);
+            testarEdicaoDeDespesa();
 
             System.out.println("=== Cenário próprio ===");
             Planejamento cenario = montarCenarioProprio();
@@ -233,7 +234,6 @@ public class TestesManuais {
         }
     }
 
-
     // Salva e carrega o planejamento; testes 12 e 13: carregar de novo não duplica, e arquivo inválido é recusado
     static void testarArquivo(Planejamento planejamento) throws PersistenciaException {
 
@@ -260,6 +260,36 @@ public class TestesManuais {
         }
         imprimirRetrato(carregado);
     }
+
+    // Testes 16 e 17: editar troca o tipo mantendo id e posição; edição recusada não deixa rastro
+    static void testarEdicaoDeDespesa() throws ValidacaoException {
+        System.out.println("=== Testes de edição de despesa ===");
+        Planejamento planejamento = montarCasoDeReferencia(); // caso novo, sem as mudanças dos testes anteriores
+        Participante ana   = planejamento.buscarParticipante(1);
+        Participante bruno = planejamento.buscarParticipante(2);
+        Participante carla = planejamento.buscarParticipante(3);
+
+        System.out.println("16. Trocar o Jantar (id 1) de fixa para por pessoa:");
+        planejamento.editarDespesa(1, new DespesaPorPessoa(1, "Jantar", 9000, List.of(ana, bruno, carla)));
+        System.out.println("   Ana " + planejamento.calcularTotalDe(ana) + ", Bruno " + planejamento.calcularTotalDe(bruno)
+                + ", Carla " + planejamento.calcularTotalDe(carla) + ", total " + planejamento.calcularCustoTotal()
+                + " (esperado 13500, 12000, 13500, 39000)");
+        Despesa primeira = planejamento.getDespesas().get(0);
+        System.out.println("   1ª da lista: id " + primeira.getId() + ", " + primeira.getClass().getSimpleName());
+
+        System.out.println("17. Editar com descrição nova e valor zero (deve recusar sem deixar rastro):");
+        Despesa antes = planejamento.buscarDespesa(1);
+        try {
+            planejamento.editarDespesa(1, new DespesaFixa(1, "Jantar caro", 0, List.of(ana, bruno, carla)));
+            System.out.println("   ERRO: aceitou o que devia recusar");
+        } catch (ValidacaoException e) {
+            System.out.println("   Recusou: " + e.getMessage());
+        }
+        Despesa depois = planejamento.buscarDespesa(1);
+        System.out.println("   Depois: " + depois.getDescricao() + ", mesma despesa de antes? " + (depois == antes)
+                + ", total " + planejamento.calcularCustoTotal());
+    }
+
 
     // Imprime um "retrato" do planejamento, para comparar antes e depois de uma recusa
     static void imprimirRetrato(Planejamento planejamento) {

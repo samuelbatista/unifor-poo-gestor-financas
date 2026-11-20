@@ -19,6 +19,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import javax.swing.event.ListSelectionListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,11 @@ public class PainelDespesas extends JPanel {
     // Nomes dos comandos dos botões (o controlador usa para saber qual foi clicado)
     public static final String INCLUIR = "incluir";
     public static final String EXCLUIR = "excluir";
+    public static final String SALVAR = "salvar";
+    public static final String LIMPAR = "limpar";
+
+    // Textos do aviso de modo (nova despesa ou edição)
+    private static final String MODO_INCLUIR = "Nova despesa: preencha e clique em Incluir.";
 
     // Opções da caixa de tipo
     public static final String FIXA = "Fixa";
@@ -69,6 +75,11 @@ public class PainelDespesas extends JPanel {
     private final JTextArea areaTotais = new JTextArea(2, 40);
     private final JButton botaoIncluir = new JButton("Incluir");
     private final JButton botaoExcluir = new JButton("Excluir selecionada");
+    private final JButton botaoSalvar = new JButton("Salvar alterações");
+    private final JButton botaoLimpar = new JButton("Limpar");
+
+    // Aviso que diz em qual modo a tela está
+    private final JLabel rotuloModo = new JLabel(MODO_INCLUIR);
 
     public PainelDespesas() {
         setLayout(new BorderLayout(8, 8));
@@ -89,6 +100,7 @@ public class PainelDespesas extends JPanel {
         rolagemParticipantes.setPreferredSize(new Dimension(220, 110));
 
         JPanel topo = new JPanel(new BorderLayout(8, 8));
+        topo.add(rotuloModo, BorderLayout.NORTH);
         topo.add(formulario, BorderLayout.CENTER);
         topo.add(rolagemParticipantes, BorderLayout.EAST);
         add(topo, BorderLayout.NORTH);
@@ -105,7 +117,9 @@ public class PainelDespesas extends JPanel {
 
         JPanel botoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         botoes.add(botaoIncluir);
+        botoes.add(botaoSalvar);
         botoes.add(botaoExcluir);
+        botoes.add(botaoLimpar);
 
         JPanel baixo = new JPanel(new BorderLayout(8, 8));
         baixo.add(areaTotais, BorderLayout.CENTER);
@@ -115,6 +129,16 @@ public class PainelDespesas extends JPanel {
         // Cada botão carrega o nome do seu comando
         botaoIncluir.setActionCommand(INCLUIR);
         botaoExcluir.setActionCommand(EXCLUIR);
+        botaoSalvar.setActionCommand(SALVAR);
+        botaoLimpar.setActionCommand(LIMPAR);
+
+        // "Salvar alterações" só fica ativo quando há uma linha selecionada
+        botaoSalvar.setEnabled(false);
+        tabela.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                botaoSalvar.setEnabled(tabela.getSelectedRow() >= 0);
+            }
+        });
     }
 
     // ===== Leitura: o controlador pergunta o que foi digitado ou escolhido =====
@@ -148,6 +172,24 @@ public class PainelDespesas extends JPanel {
     public void aoClicarNosBotoes(ActionListener ouvinte) {
         botaoIncluir.addActionListener(ouvinte);
         botaoExcluir.addActionListener(ouvinte);
+        botaoSalvar.addActionListener(ouvinte);
+        botaoLimpar.addActionListener(ouvinte);
+    }
+
+    // Liga um "ouvinte" à seleção da tabela (o controlador quer saber quando uma linha é clicada)
+    public void aoSelecionarLinha(ListSelectionListener ouvinte) {
+        tabela.getSelectionModel().addListSelectionListener(ouvinte);
+    }
+
+    // Preenche o formulário com os dados de uma despesa e avisa que a tela está em modo de edição
+    public void preencherFormulario(int id, String descricao, String valor, String tipo, List<Integer> codigosMarcados) {
+        campoDescricao.setText(descricao);
+        campoValor.setText(valor);
+        comboTipo.setSelectedItem(tipo);
+        for (Map.Entry<Integer, JCheckBox> par : caixas.entrySet()) {
+            par.getValue().setSelected(codigosMarcados.contains(par.getKey()));
+        }
+        rotuloModo.setText("Editando a despesa de id " + id + ": altere e clique em Salvar alterações (ou Limpar para voltar).");
     }
 
     // Mostra uma mensagem numa janelinha
@@ -204,5 +246,6 @@ public class PainelDespesas extends JPanel {
         for (JCheckBox caixa : caixas.values()) {
             caixa.setSelected(false);
         }
+        rotuloModo.setText(MODO_INCLUIR);
     }
 }
