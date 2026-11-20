@@ -41,6 +41,7 @@ classDiagram
         + calcularExcessoDe(participante: Participante) long
         + estaDentroDoOrcamento(participante: Participante) boolean
         + existeParticipanteAcimaDoOrcamento() boolean
+        + substituirConteudoPor(outro: Planejamento) void
 
         %% Revisão do planejamento
         + marcarParaRevisao() void
@@ -117,17 +118,15 @@ classDiagram
         + calcularValorDe(participante: Participante) long
     }
     
-    class PersistenciaPlanejamento {
+        class PersistenciaPlanejamento {
         <<interface>>
-        + salvar(planejamento: Planejamento) void
-        + carregar() Planejamento
+        + salvar(planejamento: Planejamento, caminho: String) void
+        + carregar(caminho: String) Planejamento
     }
     
     class PersistenciaEmArquivo {
-        - caminhoDoArquivo: String
-        + PersistenciaEmArquivo(caminhoDoArquivo: String)
-        + salvar(planejamento: Planejamento) void
-        + carregar() Planejamento
+        + salvar(planejamento: Planejamento, caminho: String) void
+        + carregar(caminho: String) Planejamento
     }
     
     class PersistenciaException {
