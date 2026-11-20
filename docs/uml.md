@@ -16,6 +16,7 @@ classDiagram
         - participantes: List~Participante~
         - despesas: List~Despesa~
         - ultimoIdDespesa: int
+        - marcadoParaRevisao: boolean
         
         %% Método para o CRUD de Participante
         + adicionarParticipante(participante: Participante) void
@@ -39,6 +40,12 @@ classDiagram
         + calcularCustoTotal() long
         + calcularExcessoDe(participante: Participante) long
         + estaDentroDoOrcamento(participante: Participante) boolean
+        + existeParticipanteAcimaDoOrcamento() boolean
+
+        %% Revisão do planejamento
+        + marcarParaRevisao() void
+        + desmarcarRevisao() void
+        + isMarcadoParaRevisao() boolean
         
         %% Ajudante interno: recusa despesa com participante não cadastrado
         - conferirParticipantesCadastrados(despesa: Despesa) void
