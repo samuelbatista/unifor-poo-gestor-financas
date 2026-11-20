@@ -1,10 +1,13 @@
 package app;
 
 // Imports
+import controle.ControladorArquivo;
 import controle.ControladorDespesas;
 import controle.ControladorParticipantes;
 import controle.ControladorResumo;
 import modelo.Planejamento;
+import persistencia.PersistenciaEmArquivo;
+import persistencia.PersistenciaPlanejamento;
 import visao.JanelaPrincipal;
 import visao.PainelDespesas;
 import visao.PainelParticipantes;
@@ -37,6 +40,15 @@ public class Main {
                 controladorDespesas.recarregarTela();
                 controladorResumo.recarregarTela();
             });
+
+            // 5. Arquivo: o ÚNICO lugar do programa que conhece a classe concreta de persistência
+            PersistenciaPlanejamento persistencia = new PersistenciaEmArquivo();
+            ControladorArquivo controladorArquivo = new ControladorArquivo(planejamento, persistencia, janela, () -> {
+                controladorParticipantes.recarregarTela(); // depois de abrir, todas as abas mostram o conteúdo novo
+                controladorDespesas.recarregarTela();
+                controladorResumo.recarregarTela();
+            });
+
             janela.setVisible(true);
         });
     }

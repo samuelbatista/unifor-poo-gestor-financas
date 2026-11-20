@@ -23,8 +23,14 @@ public class ControladorParticipantes implements ActionListener {
     public ControladorParticipantes(Planejamento planejamento, PainelParticipantes painel) {
         this.planejamento = planejamento;
         this.painel = painel;
-        painel.aoClicarNosBotoes(this);                              // passa a "ouvir" os botões
-        painel.mostrarParticipantes(planejamento.getParticipantes()); // mostra o que já existe
+        painel.aoClicarNosBotoes(this);                      // passa a "ouvir" os botões
+        recarregarTela();                                            // mostra o que já existe
+    }
+
+    // Mostra de novo os participantes do modelo (chamado também depois de abrir um arquivo)
+    public void recarregarTela() {
+        painel.mostrarParticipantes(planejamento.getParticipantes());
+        painel.limparFormulario();
     }
 
     // Chamado pelo Swing a cada clique em Cadastrar, Alterar ou Limpar
