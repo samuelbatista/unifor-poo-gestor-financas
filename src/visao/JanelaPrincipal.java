@@ -25,6 +25,7 @@ public class JanelaPrincipal extends JFrame {
     private static final long serialVersionUID = 1L;
 
     // Nomes dos comandos do menu (o controlador usa para saber qual foi clicado)
+    public static final String NOVO = "novo";
     public static final String ABRIR = "abrir";
     public static final String SALVAR = "salvar";
 
@@ -32,6 +33,7 @@ public class JanelaPrincipal extends JFrame {
     private final JTabbedPane abas = new JTabbedPane();
 
     // Menu Arquivo e linha de status
+    private final JMenuItem itemNovo = new JMenuItem("Novo planejamento");
     private final JMenuItem itemAbrir = new JMenuItem("Abrir...");
     private final JMenuItem itemSalvar = new JMenuItem("Salvar...");
     private final JLabel rotuloStatus = new JLabel("Pronto.");
@@ -45,11 +47,14 @@ public class JanelaPrincipal extends JFrame {
 
         // Menu Arquivo, no alto da janela
         JMenu menuArquivo = new JMenu("Arquivo");
+        menuArquivo.add(itemNovo);
+        menuArquivo.addSeparator();                               // linha separando "Novo" de "Abrir/Salvar"
         menuArquivo.add(itemAbrir);
         menuArquivo.add(itemSalvar);
         JMenuBar barraDeMenu = new JMenuBar();
         barraDeMenu.add(menuArquivo);
         setJMenuBar(barraDeMenu);
+        itemNovo.setActionCommand(NOVO);
         itemAbrir.setActionCommand(ABRIR);
         itemSalvar.setActionCommand(SALVAR);
 
@@ -72,6 +77,7 @@ public class JanelaPrincipal extends JFrame {
 
     // Liga o "ouvinte" (o controlador) aos itens do menu Arquivo
     public void aoUsarMenuArquivo(ActionListener ouvinte) {
+        itemNovo.addActionListener(ouvinte);
         itemAbrir.addActionListener(ouvinte);
         itemSalvar.addActionListener(ouvinte);
     }
@@ -80,8 +86,15 @@ public class JanelaPrincipal extends JFrame {
         rotuloStatus.setText(texto);
     }
 
-    public void mostrarMensagem(String mensagem) {
-        JOptionPane.showMessageDialog(this, mensagem);
+    // Janelinha de erro, com ícone vermelho e um título que diz o que falhou
+    public void mostrarErro(String titulo, String mensagem) {
+        JOptionPane.showMessageDialog(this, mensagem, titulo, JOptionPane.ERROR_MESSAGE);
+    }
+
+    // Pergunta "sim ou não"; só o "Sim" explícito devolve true (fechar no X conta como não)
+    public boolean confirmar(String pergunta) {
+        int resposta = JOptionPane.showConfirmDialog(this, pergunta, "Confirmar", JOptionPane.YES_NO_OPTION);
+        return resposta == JOptionPane.YES_OPTION;
     }
 
     // Abre o seletor para salvar; devolve o caminho escolhido ou null se a pessoa desistiu
