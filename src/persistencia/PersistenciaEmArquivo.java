@@ -11,32 +11,26 @@ import java.io.ObjectInputStream;
 // Persistência que grava o Planejamento num arquivo, usando serialização
 public class PersistenciaEmArquivo implements PersistenciaPlanejamento {
 
-    private String caminhoDoArquivo; // onde o arquivo fica no disco (ex.: "planejamento.dat")
-
-    public PersistenciaEmArquivo(String caminhoDoArquivo) {
-        this.caminhoDoArquivo = caminhoDoArquivo;
-    }
-
-    // Grava o planejamento inteiro (com participantes e despesas) no arquivo
+    // Grava o planejamento inteiro (com participantes e despesas) no arquivo indicado
     @Override
-    public void salvar(Planejamento planejamento) throws PersistenciaException {
-        try (FileOutputStream arquivo = new FileOutputStream(caminhoDoArquivo);
+    public void salvar(Planejamento planejamento, String caminho) throws PersistenciaException {
+        try (FileOutputStream arquivo = new FileOutputStream(caminho);
              ObjectOutputStream saida = new ObjectOutputStream(arquivo)) {
             saida.writeObject(planejamento);
         } catch (IOException e) {
-            throw new PersistenciaException("Não foi possível salvar o planejamento em " + caminhoDoArquivo + ".", e);
+            throw new PersistenciaException("Não foi possível salvar o planejamento em " + caminho + ".", e);
         }
     }
 
-    // Carrega o planejamento a partir do arquivo
+    // Carrega o planejamento a partir do arquivo indicado
     @Override
-    public Planejamento carregar() throws PersistenciaException {
-        try (FileInputStream arquivo = new FileInputStream(caminhoDoArquivo);
+    public Planejamento carregar(String caminho) throws PersistenciaException {
+        try (FileInputStream arquivo = new FileInputStream(caminho);
              ObjectInputStream entrada = new ObjectInputStream(arquivo)) {
             return (Planejamento) entrada.readObject();
         }
         catch (IOException | ClassNotFoundException | ClassCastException e) {
-            throw new PersistenciaException("Não foi possível carregar o planejamento de " + caminhoDoArquivo + ": arquivo ausente ou inválido.", e);
+            throw new PersistenciaException("Não foi possível carregar o planejamento de " + caminho + ": arquivo ausente ou inválido.", e);
         }
     }
 }

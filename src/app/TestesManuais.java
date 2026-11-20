@@ -21,6 +21,7 @@ public class TestesManuais {
             testarAlteracao(planejamento);
             testarEdicaoDeDespesa();
             testarRevisao();
+            testarAbrirNaTela();
 
             System.out.println("=== Cenário próprio ===");
             Planejamento cenario = montarCenarioProprio();
@@ -239,22 +240,22 @@ public class TestesManuais {
     static void testarArquivo(Planejamento planejamento) throws PersistenciaException {
 
         // Persistência: salva o planejamento no arquivo e carrega de volta
-        PersistenciaPlanejamento persistencia = new PersistenciaEmArquivo("planejamento.dat");
-        persistencia.salvar(planejamento);
-        Planejamento carregado = persistencia.carregar();
+        PersistenciaPlanejamento persistencia = new PersistenciaEmArquivo();
+        persistencia.salvar(planejamento, "planejamento.dat");
+        Planejamento carregado = persistencia.carregar("planejamento.dat");
         System.out.println("Custo total do planejamento carregado: " + carregado.calcularCustoTotal());
 
         // ===== Testes de arquivo =====
         System.out.println("=== Testes de arquivo ===");
 
         System.out.println("12. Carregar o mesmo arquivo de novo (nada pode dobrar/duplicar):");
-        Planejamento deNovo = persistencia.carregar();
+        Planejamento deNovo = persistencia.carregar("planejamento.dat");
         imprimirRetrato(deNovo);
 
         System.out.println("13. Carregar um arquivo de texto (docs/uml.md):");
         imprimirRetrato(carregado);
         try {
-            carregado = new PersistenciaEmArquivo("docs/uml.md").carregar();
+            carregado = persistencia.carregar("docs/uml.md");
             System.out.println("   ERRO: aceitou o que devia recusar");
         } catch (PersistenciaException e) {
             System.out.println("   Recusou: " + e.getMessage());
@@ -311,6 +312,29 @@ public class TestesManuais {
             System.out.println("   Recusou: " + e.getMessage());
         }
         System.out.println("   Marcado? " + planejamento.isMarcadoParaRevisao() + " (esperado false)");
+    }
+
+    static void testarAbrirNaTela() throws ValidacaoException, PersistenciaException {
+        System.out.println("=== Testes de abrir (substituir o conteúdo) ===");
+        PersistenciaPlanejamento persistencia = new PersistenciaEmArquivo();
+        Planejamento emUso = montarCasoDeReferencia();
+        persistencia.salvar(emUso, "planejamento.dat");
+
+        System.out.println("20. Abrir o arquivo duas vezes no planejamento em uso (nada pode duplicar):");
+        Planejamento mesmoObjeto = emUso;
+        emUso.substituirConteudoPor(persistencia.carregar("planejamento.dat"));
+        emUso.substituirConteudoPor(persistencia.carregar("planejamento.dat"));
+        imprimirRetrato(emUso);
+        System.out.println("   Continua o mesmo objeto? " + (emUso == mesmoObjeto) + " (esperado true)");
+
+        System.out.println("21. Depois de abrir: código 1 repetido é recusado e o próximo id é 5:");
+        try {
+            emUso.adicionarParticipante(new Participante(1, "Outra Ana", 5000));
+            System.out.println("   ERRO: aceitou o que devia recusar");
+        } catch (ValidacaoException e) {
+            System.out.println("   Recusou: " + e.getMessage());
+        }
+        System.out.println("   Próximo id: " + emUso.gerarIdDespesa() + " (esperado 5)");
     }
 
     // Imprime um "retrato" do planejamento, para comparar antes e depois de uma recusa

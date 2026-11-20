@@ -137,6 +137,17 @@ public class Planejamento implements Serializable {
         return calcularExcessoDe(participante) == 0;
     }
 
+    // Troca todo o conteúdo deste planejamento pelo de outro (usado ao abrir um arquivo).
+    // Este objeto continua o mesmo: quem já o segura (os controladores) passa a ver os dados novos.
+    public void substituirConteudoPor(Planejamento outro) {
+        participantes.clear();                        // 1. esvazia (abrir duas vezes não duplica)
+        despesas.clear();
+        participantes.addAll(outro.participantes);    // 2. copia o que veio do arquivo
+        despesas.addAll(outro.despesas);
+        ultimoIdDespesa = outro.ultimoIdDespesa;      // 3. ids novos continuam de onde o arquivo parou
+        marcadoParaRevisao = outro.marcadoParaRevisao;
+    }
+
     // Verdadeiro se pelo menos um participante passou do orçamento
     public boolean existeParticipanteAcimaDoOrcamento() {
         for (Participante p : participantes) {
