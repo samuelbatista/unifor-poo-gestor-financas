@@ -20,6 +20,7 @@ public class TestesManuais {
             testarArquivo(planejamento);
             testarAlteracao(planejamento);
             testarEdicaoDeDespesa();
+            testarRevisao();
 
             System.out.println("=== Cenário próprio ===");
             Planejamento cenario = montarCenarioProprio();
@@ -290,6 +291,27 @@ public class TestesManuais {
                 + ", total " + planejamento.calcularCustoTotal());
     }
 
+    static void testarRevisao() throws ValidacaoException {
+        System.out.println("=== Testes de revisão ===");
+        Planejamento planejamento = montarCasoDeReferencia(); // Ana e Carla excedem em 500
+
+        System.out.println("18. Marcar para revisão com alguém acima do orçamento:");
+        planejamento.marcarParaRevisao();
+        System.out.println("   Marcado? " + planejamento.isMarcadoParaRevisao() + " (esperado true)");
+        planejamento.desmarcarRevisao();
+        System.out.println("   Depois de desmarcar: " + planejamento.isMarcadoParaRevisao() + " (esperado false)");
+
+        System.out.println("19. Marcar para revisão com todos dentro (deve recusar):");
+        planejamento.alterarParticipante(1, "Ana", 8000);   // Ana: total 7500, orçamento 8000
+        planejamento.alterarParticipante(3, "Carla", 7500); // Carla: no limite exato, conta como dentro
+        try {
+            planejamento.marcarParaRevisao();
+            System.out.println("   ERRO: aceitou o que devia recusar");
+        } catch (ValidacaoException e) {
+            System.out.println("   Recusou: " + e.getMessage());
+        }
+        System.out.println("   Marcado? " + planejamento.isMarcadoParaRevisao() + " (esperado false)");
+    }
 
     // Imprime um "retrato" do planejamento, para comparar antes e depois de uma recusa
     static void imprimirRetrato(Planejamento planejamento) {

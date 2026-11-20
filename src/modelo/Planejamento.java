@@ -14,6 +14,7 @@ public class Planejamento implements Serializable {
     private List<Participante> participantes = new ArrayList<>();
     private List<Despesa> despesas = new ArrayList<>();
     private int ultimoIdDespesa = 0; // último id de despesa entregue (0 = nenhum ainda)
+    private boolean marcadoParaRevisao = false; // registro de que o planejamento precisa ser revisto
 
     // CRUD Participante: Create (guarda o participante na lista)
     public void adicionarParticipante(Participante participante) throws ValidacaoException {
@@ -135,6 +136,31 @@ public class Planejamento implements Serializable {
     public boolean estaDentroDoOrcamento(Participante participante) {
         return calcularExcessoDe(participante) == 0;
     }
+
+    // Verdadeiro se pelo menos um participante passou do orçamento
+    public boolean existeParticipanteAcimaDoOrcamento() {
+        for (Participante p : participantes) {
+            if (!estaDentroDoOrcamento(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Revisão: registra o planejamento para revisão (só faz sentido se alguém excede)
+    public void marcarParaRevisao() throws ValidacaoException {
+        if (!existeParticipanteAcimaDoOrcamento()) {
+            throw new ValidacaoException("Ninguém está acima do orçamento: não há o que revisar.");
+        }
+        marcadoParaRevisao = true;
+    }
+
+    // Revisão: retira o registro (por exemplo, depois que a equipe revisou)
+    public void desmarcarRevisao() {
+        marcadoParaRevisao = false;
+    }
+
+    public boolean isMarcadoParaRevisao() { return marcadoParaRevisao; }
 
     // Ajudante: recusa a despesa se algum participante dela não estiver cadastrado neste planejamento
     private void conferirParticipantesCadastrados(Despesa despesa) throws ValidacaoException {
