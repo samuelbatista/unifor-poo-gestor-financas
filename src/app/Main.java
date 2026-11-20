@@ -3,6 +3,7 @@ package app;
 // Imports
 import controle.ControladorDespesas;
 import controle.ControladorParticipantes;
+import controle.ControladorResumo;
 import modelo.Planejamento;
 import visao.JanelaPrincipal;
 import visao.PainelDespesas;
@@ -28,10 +29,14 @@ public class Main {
             // 3. Controller
             ControladorParticipantes controladorParticipantes = new ControladorParticipantes(planejamento, painelParticipantes);
             ControladorDespesas controladorDespesas = new ControladorDespesas(planejamento, painelDespesas);
+            ControladorResumo controladorResumo = new ControladorResumo(planejamento, painelResumo);
 
             // 4. View: Renderizar tela Principal
             JanelaPrincipal janela = new JanelaPrincipal(painelParticipantes, painelDespesas, painelResumo);
-            janela.aoTrocarDeAba(e -> controladorDespesas.recarregarTela()); // ao entrar na aba, a tela se atualiza
+            janela.aoTrocarDeAba(e -> {          // ao trocar de aba, as telas se atualizam
+                controladorDespesas.recarregarTela();
+                controladorResumo.recarregarTela();
+            });
             janela.setVisible(true);
         });
     }

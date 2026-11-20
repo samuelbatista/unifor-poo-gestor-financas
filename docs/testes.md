@@ -67,3 +67,8 @@ Os testes do modelo (sem a tela) estão em `src/app/TestesManuais.java`. Para ro
     java -cp out app.TestesManuais
 
 A saída mostra o resumo do caso de referência (teste 1), as recusas de entradas inválidas com o retrato antes e depois (teste 3), o salvar e carregar (testes 6 e 7) e o resumo do cenário próprio (teste 8). Os valores aparecem em centavos.
+
+
+## Decisões
+
+- **Registrar para revisão:** a aba Resumo tem o botão "Marcar para revisão", que grava uma marca no `Planejamento`. O modelo só aceita a marca se algum participante estiver acima do orçamento; o botão "Retirar marca de revisão" a remove.
